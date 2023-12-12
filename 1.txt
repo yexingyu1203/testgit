@@ -1,6 +1,5 @@
 我是叶星玉
 hhh
-<<<<<<< HEAD
 This is master branch.
 .....
-处理冲突
+xiaohong
