@@ -228,11 +228,19 @@ $ git clone git://github.com/schacon/grit.git mygrit
   现在我想使用版本回退操作，我想把当前的版本回退到上一个版本，要使用什么命令呢？可以使用如下2种命令，第一种是：`git reset --hard HEAD^ `那么如果要回退到上上个版本只需把HEAD^ 改成 HEAD^^ 以此类推。那如果要回退到前100个版本的话，使用上面的方法肯定不方便，我们可以使用下面的简便命令操作：`git reset --hard HEAD~100 `即可
 
 ```
-git reset --hard Head~0	表示回退到上一次代码提交时的状态
-git reset --hard Head~1 表示回退到上上次代码提交时的状态
+git reset --hard Head~1	表示回退到上一次代码提交时的状态
+git reset --hard Head~2 表示回退到上上次代码提交时的状态
 ```
 
 
+
+* 通过版本号切换版本
+
+  ```
+  git reset --hard [版本号]
+  ```
+
+  
 
 
 
