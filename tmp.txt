@@ -1,4 +1,2 @@
 this is a new file.
-<<<<<<< HEAD
-我是xH，这是我的数据
-
+hhh
