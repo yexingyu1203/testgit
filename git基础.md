@@ -282,7 +282,7 @@ git reset --hard Head~2 表示回退到上上次代码提交时的状态
 $ git push origin master
   ```
   
-  * 也可以通过命令 `git remote add [别名比如origion]   远程仓库链接
+  * 也可以通过命令 `git remote add [别名比如origion]`   远程仓库链接
 
 
 
