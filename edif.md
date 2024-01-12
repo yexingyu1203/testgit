@@ -16,6 +16,8 @@ intermediary adj.中间的，媒介的 n.中间人，媒介
 
 nested adj.嵌套的，内嵌的
 
+other than 除了，不同于
+
 
 
 * libraries
@@ -44,3 +46,19 @@ nested adj.嵌套的，内嵌的
     
 
   * technology information
+
+
+
+
+
+
+
+```edif
+(design root
+	(cellRef TopOfDesignCell
+		(libraryRef CMOSLibrary)))
+```
+
+设计root指定为**由TopOfDesignCell开始**，该单元可以在CMOSLibrary中找到。
+
+design：指定the starting points for this file
