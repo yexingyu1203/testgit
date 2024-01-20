@@ -1,4 +1,6 @@
+diameter n.直径
 
+successive adj.连续的，接替的，依次的
 
 # ASCII格式约定：
 
@@ -17,26 +19,33 @@
 # ASCII文件结构：
 
 * start of file
+
 * system parameters
+  
   * 从`*SCH*`开始
+  
 * plot output settings
   * 这是一个可选的部分
   * 从`*CAM*`开始
+  
 * PCB layer definition and design rules
   * 可选的部分
   * 从`*MISC*`开始
 
 * fields
-  * 控制语句`*FIELDS*`， `"fieldname" fieldvalue`
-
+  
+* 控制语句`*FIELDS*`， `"fieldname" fieldvalue`
+  
 * start  of schematic sheet
 
   从`*SHT*`开始
 
 * text definition
 
-  >x y rotation justification height width field fontinfo textstring
+  `*TEXT*`
 
+  >x y rotation justification height width field fontinfo textstring
+  
   * rotation 
   * justification 
   * height 10~1000
@@ -63,12 +72,42 @@
 
     >type 
     >
-    >coners
+    >​	open/closed(最少4个corner)/circle
     >
-    >width
+    >corners:
+    >
+    >​	open item: it is the number of corners
+    >
+    >​	closed item:it is the number of 1+corners
+  >
+    >​	circles:2corners
+    >
+    >width:line width
     >
     >linestyle
     >
     >x y
-
+  
   * text definitions
+
+
+
+* CAE DECAL Definition
+
+  `*CAEDECAL*`
+
+  该部分定义了原理图中的逻辑符号，`CAEDECAL`信息包含部分概述、部分文本和终端信息。
+  
+  * header lines
+  
+    包含4行
+  
+  * attribute label locations
+  
+  * piece definitioins
+  
+  * text definitions
+  
+  * terminal definitions
+
+
