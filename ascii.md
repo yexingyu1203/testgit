@@ -18,6 +18,26 @@ successive adj.连续的，接替的，依次的
 
 # ASCII文件结构：
 
+> control statements:
+>
+> * `*REMARK*`  
+> * `*SCH*`  general paremeter command
+> * `*CAM*`  print and plot settings
+> * `*MICS*` misellaneous seection (layers and rules data)
+> * `*FIELDS*`
+> * `*SHT*`
+> * `*LINES*`
+> * `*TEXT*`
+> * `*CAEDECAL*`
+> * `*PARTTYPE*`
+> * `*PART*`
+> * `*BUSSES*`
+> * `*OFFPAGE REFS*`
+> * `*TIEDOTS*` tie dot control command
+> * `*CONNECTION*`
+
+
+
 * start of file
 
 * system parameters
@@ -111,3 +131,35 @@ successive adj.连续的，接替的，依次的
   * terminal definitions
 
 
+
+* tie dot definition
+
+  ```
+  @@@Dnumber x y
+  ```
+
+* off-page reference
+
+  * @@@Onumber
+    * number从零开始有序增长
+  * netname
+    * 非页面符号连接的信号名称
+  * type
+  * x y
+  * ori
+    * orientation 0~90
+  * xym
+    * 0:default
+    * 1:X镜像
+    * 2:Y镜像
+    * 3: X&Y镜像
+  * alt
+
+* Bus Definition
+
+  从`*BUSSES*`开始
+
+  * @@@Bnumber
+  * busname
+  * corners:the number of corners in the bus
+  * x y
