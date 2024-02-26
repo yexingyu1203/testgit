@@ -8,13 +8,23 @@
   
   * 能够存放8位数据（编码）即可，不需要操作字符
   
-* 按Enter键换行，行末尾\r\n?
 
-  * 是的
+
 
 * BusGraph是？
 
-* Designator是什么？端口名和显示名称的映射指的是？
+* Designator是什么？
+
+  * 元件的参考编号，例如R5、TP5、LED1等等
+  
+* portInstance端口名和显示名称的映射指的是？
+
+  ```
+  (portInstance &1 (designator (stringDisplay "1")))
+  ```
+
+  * &1 是端口名
+  * "1"是显示名称
 
 * findNode(根节点，...节点类型)； 这些节点类型是“纵向的关系”
 
@@ -26,6 +36,19 @@
 
 
 
+* transform
+
+  ![1708425474755](D:\study\test1\testgit\巢粉\transform.png)
+
+
+
+* std::remove
+  *  需要结合容器的erase函数使用‘
+
+
+
+
+* EDIFReader.cpp中 Line45 为什么用std::move()?
 
 
 
@@ -33,6 +56,8 @@
 
 
 
+* ASCGlobalUtils.h中旋转处理180度坐标变换有问题？
+* ASCSectionBase.h中 Line90  引用的封装名称是什么？Instance节点名？InstanceData结构体中的name?
 
 
 

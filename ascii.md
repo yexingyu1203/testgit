@@ -16,6 +16,8 @@ successive adj.连续的，接替的，依次的
 
 
 
+
+
 # ASCII文件结构：
 
 > control statements:
@@ -35,6 +37,7 @@ successive adj.连续的，接替的，依次的
 > * `*OFFPAGE REFS*`
 > * `*TIEDOTS*` tie dot control command
 > * `*CONNECTION*`
+> * `*NETNAMES*`
 
 
 
@@ -159,7 +162,19 @@ successive adj.连续的，接替的，依次的
 
   从`*BUSSES*`开始
 
-  * @@@Bnumber
+  * @@@**B**number
   * busname
   * corners:the number of corners in the bus
   * x y
+
+
+
+# 主要解析段落
+
+- `*CAEDECAL*` cae封装
+- `*PARTTYPE*`
+- `*PART*`
+- `*OFFPAGE REFS*`
+- `*TIEDOTS*` 
+- `*CONNECTION*`
+- `*NETNAMES*`
