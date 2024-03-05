@@ -172,9 +172,57 @@ successive adj.连续的，接替的，依次的
 # 主要解析段落
 
 - `*CAEDECAL*` cae封装
+
+  - Hearder lines
+
+    - 第一行： 
+
+      ```
+      name x y pnhgt pnwid labels pieces txt terms vis pflags
+      ```
+
+    - 第二行
+
+      TIMESTAMP
+
+    - 第三行
+
+      fontinfo
+
+    - 第四行
+
+      fontinfo
+
+  - Atrribute label locations
+
+    ```
+    x y rotation justifiction height width fontinfo 
+     textstring
+    ```
+
+    textstring:  REF-DES   PART-TYPE
+
+  - piece definition
+
+    - type of line
+    - the number of corners to the piece
+    - width
+    - linestyle
+
+  - terminal definitions
+
+    **T** ......
+
+    **P**......
+
 - `*PARTTYPE*`
+
 - `*PART*`
+
 - `*OFFPAGE REFS*`
+
 - `*TIEDOTS*` 
+
 - `*CONNECTION*`
+
 - `*NETNAMES*`

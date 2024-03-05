@@ -92,7 +92,7 @@ PageSize是page和symbol的环境属性。
 		(rectangle
 			(pt -120 -100)
 			(pt 120 100))
-	(figure..）)
+	(figure..))
 
 ````
 
