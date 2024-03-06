@@ -112,3 +112,26 @@ PageSize是page和symbol的环境属性。
 
 
 
+* cellType
+
+  * GENERIC
+
+    单元类型GENERIC指定单元是一个同类单元，并且包含除TIE和RIPPER类型单元外的所有cell的用途。
+
+  * TIE
+
+    单元类型TIE指出单元是**用于描述目标之间的连接关系**。TIE示例只被允许**用于net中**，并且主要是连接一个网表中的子网表。TE单元的定义在其界面上必须包含一个端口或一个端口阵列定义。多个子网表可以经端口连接到这个单一的网上。
+
+  * RIPPER
+
+    单元类型RIPPER指出单元是用于描述目标之间的连接关系。RIPPER示例用于合并不同名字的网表，描述网表之间的置换，或者提取网表阵列和网表组中的各个部分。RIPPER界面必须包含至少两个端口，或两个端口阵列，或两个端口组。在RIPPER的使用中，只有一个网表可以引用每个端口。RIPPER类型的单元示例只能出现在contents和page构件中。
+
+
+
+* cell => view => interface下面有Symbol节点，用于定义元器件封装的形状、轮廓等。但是power和gnd没有symbol节点，它们的这些内容都定义在cell => view =>contentes中。
+
+* pointList
+
+  cell=>view=>interface=>symbol=>figure=>path下面的pointList，这些点的顺序
+
+  和Ascii文件decal中的piece definition后面的点顺序是相反的。

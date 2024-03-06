@@ -8,7 +8,6 @@
   
   * 能够存放8位数据（编码）即可，不需要操作字符
   
-
 * Designator是什么？
 
   * 元件的参考编号，例如R5、TP5、LED1等等
@@ -39,8 +38,9 @@
 
 
 * std::remove
-  *  需要结合容器的erase函数使用
-
+  
+*  需要结合容器的erase函数使用
+  
 * ASCSectionBase.h中 Line90  引用的封装名称是什么？Instance节点名？是否和InstanceData结构体中的name重复?
 
   
@@ -144,7 +144,7 @@
 
 
 
-
+* PKGORDER？
 
 
 

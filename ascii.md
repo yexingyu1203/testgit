@@ -102,15 +102,15 @@ successive adj.连续的，接替的，依次的
     >​	open item: it is the number of corners
     >
     >​	closed item:it is the number of 1+corners
-  >
-    >​	circles:2corners
-    >
+    
+    > circles:2corners
+    
     >width:line width
-    >
-    >linestyle
-    >
-    >x y
-  
+      >
+      >linestyle
+      >
+      >x y
+    
   * text definitions
 
 
@@ -202,12 +202,15 @@ successive adj.连续的，接替的，依次的
 
     textstring:  REF-DES   PART-TYPE
 
+    如果eds文件中cell=》view=》interface=》symbol下面有propertyDisplay节点并且节点的第一个属性为Comment，那么Comment也会作为textstring的一部分。并且HeaderLine里面的labels+1
+
   - piece definition
 
     - type of line
     - the number of corners to the piece
     - width
     - linestyle
+    - 换行显示每一个角的坐标点
 
   - terminal definitions
 
