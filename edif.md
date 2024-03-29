@@ -42,9 +42,13 @@ other than 除了，不同于
           a simple port/ a port array / a port boundle
 
           port array中的port有相同的特征
-
+        
+        * symbol
+      
+          * portImplementation
+  
     
-
+  
   * technology information
 
 
@@ -128,7 +132,7 @@ PageSize是page和symbol的环境属性。
 
 
 
-* cell => view => interface下面有Symbol节点，用于定义元器件封装的形状、轮廓等。但是power和gnd没有symbol节点，它们的这些内容都定义在cell => view =>contentes中。
+* cell => view => interface下面有Symbol节点，用于定义元器件封装的形状、轮廓等。但是power和gnd没有symbol节点，它们的这些内容都定义在cell => view =>contents中。
 
 * pointList
 

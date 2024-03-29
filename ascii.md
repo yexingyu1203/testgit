@@ -181,6 +181,8 @@ successive adj.连续的，接替的，依次的
       name x y pnhgt pnwid labels pieces txt terms vis pflags
       ```
 
+      这里的name是封装名，对应cell节点的名字
+
     - 第二行
 
       TIMESTAMP

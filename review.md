@@ -134,19 +134,9 @@
 
 
 
-
-
-
-
-- ASCGlobalUtils.h中旋转处理270度坐标变换
-
-
-
-
-
 * PKGORDER？
 
 
 
-
+* ASCCaeDecal中 556行，当port节点没有direction或者designator？
 
