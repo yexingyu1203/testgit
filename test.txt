@@ -1,3 +1,0 @@
-123456
-abcdef
-That's true.
