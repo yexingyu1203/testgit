@@ -523,13 +523,13 @@ public:
 class Cat:public Animal
 {
 public:
-	void sound();
+	void sound()override;
 };
 
-class Dog
+class Dog:public Animal
 {
 public:
-	void sound();
+	void sound()override;
 };
 ```
 
@@ -653,3 +653,556 @@ endif()
 
 
 * `BUILD_SHARED_LIBS`是CMake的一个全局标志。因为CMake内部要查询`BUILD_SHARED_LIBS`全局变量，所以`add_library`命令可以在不传递`STATIC/SHARED/OBJECT`参数的情况下调用；如果为`false`或未定义，将生成一个静态库。
+
+
+
+### 向用户显示选项
+
+如何让`USE_LIBRARY`也可以从外部进行更改：
+
+1. 用一个选项替换上一个示例的`set(USE_LIBRARY OFF)`命令。该选项将修改`USE_LIBRARY`的值，并设置其默认值为`OFF`：
+
+   ```cmake
+   option(USE_LIBRARY "Compile sources into a library" OFF)
+   ```
+
+2. 现在，可以通过CMake的`-D`CLI选项，将信息传递给CMake来切换库的行为：
+
+   ```cmake
+   ~:mkdir build 
+   ~:cd build
+   ~:cmake -D USE_LIBRARY=ON ..
+   ~:cmake --build .
+   ```
+
+   
+
+`option`可接受三个参数：
+
+```
+option(<option_variable> "help string" [initial value])
+```
+
+- `<option_variable>`表示该选项的变量的名称。
+- `"help string"`记录选项的字符串，在CMake的终端或图形用户界面中可见。
+- `[initial value]`选项的默认值，可以是`ON`或`OFF`。
+
+
+
+
+
+```cmake
+cmake_dependent_option(<OPTION_NAME> "<help_text>" <default_value> <depends> <force_value>)
+```
+
+第一个参数为选项名称。
+
+第二个参数为选项介绍。
+
+第三个参数为默认值。
+
+当第四个参数为TRUE时，**开启此选项**并**自动设置**第二个参数的值为默认值。否则，将**强制**设置该选项默认值为第五个参数值，使用者**不能**修改。
+
+
+
+下面是一个例子：
+
+```cmake
+include(CMakeDependentOption)
+cmake_dependent_option(BUILD_TESTS "Build your tests" ON "VAL1;VAL2" OFF)
+```
+
+如上代码是下面的一个缩写：
+
+```cmake
+if(VAL1 AND VAL2)
+    set(BUILD_TESTS_DEFAULT ON)
+else()
+    set(BUILD_TESTS_DEFAULT OFF)
+endif()
+```
+
+
+
+### 切换构建类型
+
+控制生成构建系统使用的配置变量是`CMAKE_BUILD_TYPE`。该变量默认为空，CMake识别的值为:
+
+1. **Debug**：用于在没有优化的情况下，使用带有调试符号构建库或可执行文件。
+2. **Release**：用于构建的优化的库或可执行文件，不包含调试符号。
+3. **RelWithDebInfo**：用于构建较少的优化库或可执行文件，包含调试符号。
+4. **MinSizeRel**：用于不增加目标代码大小的优化方式，来构建库或可执行文件
+
+
+
+如果`CMAKE_BUILD_TYPE`没有被显式的设置，那它将保持默认值，即空字符串，这时`CMAKE_CXX_FLAG_<CONFIG>`将不会生效，而只使用`CMAKE_CXX_FLAGS`的值来进行编译。
+
+
+
+* 各种构建模式在编译器选项上的区别
+
+  在Release模式下，追求的是程序的最佳性能表现，在此情况下，编译器会对程序做最大的代码优化以达到最快运行速度。另一方面，由于代码优化后不与源代码一致，此模式下一般会丢失大量的调试信息。
+
+   1. Debug: `-O0 -g`
+ 2.  Release: `-O3 -DNDEBUG`
+   3. MinSizeRel: `-Os -DNDEBUG`
+   4. RelWithDebInfo: `-O2 -g -DNDEBUG`
+
+此外需要注意：`NDEBUG`宏会使`assert`宏被去除掉（assert宏主要是在调试时使用）。
+
+
+
+下面是对Visual Studio的CMake调用:
+
+```cmake
+mkdir -p build
+cd build
+cmake .. -G"Visual Studio 12 2017 Win64" -D CMAKE_CONFIGURATION_TYPES="Release;Debug"
+```
+
+将为Release和Debug配置生成一个构建树。然后，您可以使`--config`标志来决定构建这两个中的哪一个:
+
+```cmake
+cmake --build . --config Release
+```
+
+
+
+### 设置编译选项
+
+```cmake
+target_compile_options(compute-areas
+  PRIVATE
+    "-fPIC"
+  )
+```
+
+编译选项可以添加三个级别的可见性：`INTERFACE`、`PUBLIC`和`PRIVATE`。
+
+可见性的含义如下:
+
+- **PRIVATE**，编译选项会应用于给定的目标，不会传递给与目标相关的目标。我们的示例中， 即使`compute-areas`将链接到`geometry`库，`compute-areas`也不会继承`geometry`目标上设置的编译器选项。
+- **INTERFACE**，给定的编译选项将只应用于指定目标，并传递给与目标相关的目标。
+- **PUBLIC**，编译选项将应用于指定目标和使用它的目标。
+
+
+
+
+
+### 为语言设定标准
+
+```cmake
+add_executable(animal-farm animal-farm.cpp)
+set_target_properties(animal-farm
+  PROPERTIES
+    CXX_STANDARD 14
+    CXX_EXTENSIONS OFF
+    CXX_STANDARD_REQUIRED ON
+  )
+```
+
+- **CXX_STANDARD**会设置我们想要的标准。
+- **CXX_EXTENSIONS**告诉CMake，只启用`ISO C++`标准的编译器标志，而不使用特定编译器的扩展。
+- **CXX_STANDARD_REQUIRED**指定所选标准的版本。如果这个版本不可用，CMake将停止配置并出现错误。当这个属性被设置为`OFF`时，CMake将寻找下一个标准的最新版本，直到一个合适的标志。
+
+
+
+
+
+## 检测环境
+
+### 检测操作系统
+
+```cmake
+# set minimum cmake version
+cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
+
+# project name, in this case no language required
+project(recipe-01 LANGUAGES NONE)
+
+# print custom message depending on the operating system
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+  message(STATUS "Configuring on/for Linux")
+elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+  message(STATUS "Configuring on/for macOS")
+elseif(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+  message(STATUS "Configuring on/for Windows")
+elseif(CMAKE_SYSTEM_NAME STREQUAL "AIX")
+  message(STATUS "Configuring on/for IBM AIX")
+else()
+  message(STATUS "Configuring on/for ${CMAKE_SYSTEM_NAME}")
+endif()
+
+```
+
+```
+-- Configuring on/for Windows
+```
+
+
+
+### 处理与平台相关的源代码
+
+通过`CMAKE_SYSTEM_NAME`变量的值判断当前系统
+
+```cmake
+# set minimum cmake version
+cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
+
+# project name and language
+project(recipe-02 LANGUAGES CXX)
+
+# define executable and its source file
+add_executable(hello-world hello-world.cpp)
+
+# let the preprocessor know about the system name
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+  target_compile_definitions(hello-world PUBLIC "IS_LINUX")
+endif()
+if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+  target_compile_definitions(hello-world PUBLIC "IS_MACOS")
+endif()
+if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+  target_compile_definitions(hello-world PUBLIC "IS_WINDOWS")
+endif()
+```
+
+```cpp
+#include <cstdlib>
+#include <iostream>
+#include <string>
+
+std::string say_hello() {
+#ifdef IS_WINDOWS
+  return std::string("Hello from Windows!");
+#elif IS_LINUX
+  return std::string("Hello from Linux!");
+#elif IS_MACOS
+  return std::string("Hello from macOS!");
+#else
+  return std::string("Hello from an unknown system!");
+#endif
+}
+
+int main() {
+  std::cout << say_hello() << std::endl;
+  return EXIT_SUCCESS;
+}
+```
+
+```
+Hello from Windows!
+```
+
+
+
+`target_compile_definitions` 是 CMake 中的一个命令，用于为指定的目标（target）添加编译定义（compile definitions）。**这些定义通常用于在编译时向源代码中注入特定的宏定义。**
+
+
+
+### 处理与编译器相关的源代码
+
+```cmake
+# set minimum cmake version
+cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
+
+# project name and language
+project(recipe-03 LANGUAGES CXX)
+
+# define executable and its source file
+add_executable(hello-world hello-world.cpp)
+
+target_compile_definitions(hello-world PUBLIC "COMPILER_NAME=\"${CMAKE_CXX_COMPILER_ID}\"")
+
+# let the preprocessor know about the compiler vendor
+if(CMAKE_CXX_COMPILER_ID MATCHES Intel)
+  target_compile_definitions(hello-world PUBLIC "IS_INTEL_CXX_COMPILER")
+endif()
+if(CMAKE_CXX_COMPILER_ID MATCHES GNU)
+  target_compile_definitions(hello-world PUBLIC "IS_GNU_CXX_COMPILER")
+endif()
+if(CMAKE_CXX_COMPILER_ID MATCHES PGI)
+  target_compile_definitions(hello-world PUBLIC "IS_PGI_CXX_COMPILER")
+endif()
+if(CMAKE_CXX_COMPILER_ID MATCHES XL)
+  target_compile_definitions(hello-world PUBLIC "IS_XL_CXX_COMPILER")
+endif()
+# etc ...
+```
+
+```cpp
+#include <cstdlib>
+#include <iostream>
+#include <string>
+
+std::string say_hello() {
+#ifdef IS_INTEL_CXX_COMPILER
+  // only compiled when Intel compiler is selected
+  // such compiler will not compile the other branches
+  return std::string("Hello Intel compiler!");
+#elif IS_GNU_CXX_COMPILER
+  // only compiled when GNU compiler is selected
+  // such compiler will not compile the other branches
+  return std::string("Hello GNU compiler!");
+#elif IS_PGI_CXX_COMPILER
+  // etc.
+  return std::string("Hello PGI compiler!");
+#elif IS_XL_CXX_COMPILER
+  return std::string("Hello XL compiler!");
+#else
+  return std::string("Hello unknown compiler - have we met before?");
+#endif
+}
+
+int main() {
+  std::cout << say_hello() << std::endl;
+  std::cout << "compiler name is " COMPILER_NAME << std::endl;
+  return EXIT_SUCCESS;
+}
+```
+
+````
+Hello unknown compiler - have we met before?
+compiler name is MSVC
+````
+
+
+
+
+
+### 检测处理器体系结构
+
+`CMAKE_SIZEOF_VOID_P` 是 CMake 中一个预定义的变量，它表示目标平台上 `void*` 指针的大小（以字节为单位）。这个值通常用于检测目标平台是 32 位还是 64 位。
+
+```cmake
+# set minimum cmake version
+cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
+
+# project name and language
+project(recipe-04 LANGUAGES CXX)
+
+# define executable and its source file
+add_executable(arch-dependent arch-dependent.cpp)
+
+# let the preprocessor know about the size of void *
+if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+  target_compile_definitions(arch-dependent PUBLIC "IS_64_BIT_ARCH")
+  message(STATUS "Target is 64 bits")
+else()
+  target_compile_definitions(arch-dependent PUBLIC "IS_32_BIT_ARCH")
+  message(STATUS "Target is 32 bits")
+endif()
+
+
+target_compile_definitions(arch-dependent
+  PUBLIC "ARCHITECTURE=${CMAKE_HOST_SYSTEM_PROCESSOR}"
+  )
+```
+
+```cpp
+#include <cstdlib>
+#include <iostream>
+#include <string>
+
+#define STRINGIFY(x) #x
+#define TOSTRING(x) STRINGIFY(x)
+
+std::string say_hello() {
+  std::string arch_info(TOSTRING(ARCHITECTURE));
+  arch_info += std::string(" architecture. ");
+#ifdef IS_32_BIT_ARCH
+  return arch_info + std::string("Compiled on a 32 bit host processor.");
+#elif IS_64_BIT_ARCH
+  return arch_info + std::string("Compiled on a 64 bit host processor.");
+#else
+  return arch_info + std::string("Neither 32 nor 64 bit, puzzling ...");
+#endif
+}
+
+int main() {
+  std::cout << say_hello() << std::endl;
+  return EXIT_SUCCESS;
+}
+```
+
+```
+AMD64 architecture. Compiled on a 64 bit host processor.
+```
+
+
+
+## 创建和运行测试
+
+
+
+### 创建简单的单元测试
+
+- `enable_testing()`，测试这个目录和所有子文件夹(因为我们把它放在主`CMakeLists.txt`)。
+
+- `add_test()`，定义一个新的测试，并设置测试名称和运行命令。
+
+  ```cmake
+  add_test(
+    NAME cpp_test
+    COMMAND $<TARGET_FILE:cpp_test>
+    )
+  ```
+
+  生成器表达式:`$<TARGET_FILE:cpp_test>`。生成器表达式，是在生成**构建系统生成时**的表达式。
+
+
+
+### 使用Catch2库进行单元测试
+
+需要`catch.hpp`头文件，可以从 <https://github.com/catchorg/Catch2> 下载，并将它与`test.cpp`一起放在项目的根目录下
+
+`--success`选项可传递给单元测试的可执行文件。这是一个Catch2选项，测试成功时，也会有输出:
+
+```cmake
+enable_testing()
+add_test(
+  NAME catch_test
+  COMMAND $<TARGET_FILE:cpp_test> --success
+  )
+```
+
+```cpp
+//test.cpp
+#include "sum_integers.hpp"
+// this tells catch to provide a main()
+// only do this in one cpp file
+#define CATCH_CONFIG_MAIN
+#include "catch.hpp"
+#include <vector>
+TEST_CASE("Sum of integers for a short vector", "[short]")
+{
+  auto integers = {1, 2, 3, 4, 5};
+  REQUIRE(sum_integers(integers) == 15);
+}
+TEST_CASE("Sum of integers for a longer vector", "[long]")
+{
+  std::vector<int> integers;
+  for (int i = 1; i < 1001; ++i)
+  {
+    integers.push_back(i);
+  }
+  REQUIRE(sum_integers(integers) == 500500);
+}
+```
+
+
+
+### 使用Google Test库进行单元测试
+
+
+
+```cpp
+#include "sum_integers.hpp"
+#include "gtest/gtest.h"
+#include <vector>
+int main(int argc, char **argv) {
+  ::testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
+}
+TEST(example, sum_zero) {
+  auto integers = {1, -1, 2, -2, 3, -3};
+  auto result = sum_integers(integers);
+  ASSERT_EQ(result, 0);
+}
+TEST(example, sum_five) {
+  auto integers = {1, 2, 3, 4, 5};
+  auto result = sum_integers(integers);
+  ASSERT_EQ(result, 15);
+}
+```
+
+显式地将`gtest.h`，而不将其他Google Test源放在代码项目存储库中，会在配置时使用`FetchContent`模块下载它们。
+
+```cmake
+# set minimum cmake version
+cmake_minimum_required(VERSION 3.11 FATAL_ERROR)
+
+# project name and language
+project(recipe-03 LANGUAGES CXX)
+
+# require C++11
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+
+# example library
+add_library(sum_integers sum_integers.cpp)
+
+# main code
+add_executable(sum_up main.cpp)
+target_link_libraries(sum_up sum_integers)
+
+# we will use the network to fetch Google Test sources
+# make it possible to disable unit tests when not on network
+option(ENABLE_UNIT_TESTS "Enable unit tests" ON)
+message(STATUS "Enable testing: ${ENABLE_UNIT_TESTS}")
+
+if(ENABLE_UNIT_TESTS)
+  # the following code to fetch googletest
+  # is inspired by and adapted after:
+  #   - https://cmake.org/cmake/help/v3.11/module/FetchContent.html
+  include(FetchContent)
+
+  FetchContent_Declare(
+    googletest
+    GIT_REPOSITORY https://github.com/google/googletest.git
+    GIT_TAG        release-1.8.0
+  )
+
+  FetchContent_GetProperties(googletest)
+
+  if(NOT googletest_POPULATED)
+    FetchContent_Populate(googletest)
+
+    # Prevent GoogleTest from overriding our compiler/linker options
+    # when building with Visual Studio
+    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+    # Prevent GoogleTest from using PThreads
+    set(gtest_disable_pthreads ON CACHE BOOL "" FORCE)
+
+    # adds the targers: gtest, gtest_main, gmock, gmock_main
+    add_subdirectory(
+      ${googletest_SOURCE_DIR}
+      ${googletest_BINARY_DIR}
+      )
+
+    # Silence std::tr1 warning on MSVC
+    if(MSVC)
+      foreach(_tgt gtest gtest_main gmock gmock_main)
+        target_compile_definitions(${_tgt}
+          PRIVATE
+            "_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING"
+          )
+      endforeach()
+    endif()
+  endif()
+
+  add_executable(cpp_test "")
+
+  target_sources(cpp_test
+    PRIVATE
+      test.cpp
+    )
+
+  target_link_libraries(cpp_test
+    PRIVATE
+      sum_integers
+      gtest_main
+    )
+
+  enable_testing()
+
+  add_test(
+    NAME google_test
+    COMMAND $<TARGET_FILE:cpp_test>
+    )
+endif()
+```
+
